@@ -1,0 +1,75 @@
+# 2019-10-21===========================================================================================
+train_baseline.py + cifar10 + resnet20
+parameters:
+    parser.add_argument('--print_freq', type=int, default=10, help='frequency of showing training results on console')
+    parser.add_argument('--epochs', type=int, default=200, help='number of total epochs to run')
+    parser.add_argument('--batch_size', type=int, default=128, help='The size of batch')
+    parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
+    parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
+    parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight decay')
+    parser.add_argument('--num_class', type=int, default=10, help='number of classes')
+    parser.add_argument('--cuda', type=int, default=1)
+
+    # net and dataset choosen
+    parser.add_argument('--data_name', type=str, default='cifar10', required=False, help='name of dataset')# cifar10/cifar100
+    parser.add_argument('--net_name', type=str, default='resnet20',required=False, help='name of basenet')
+
+time:about 60mins
+max prec@1:92.04  prec@5:99.79
+
+# 2019-10-22==================================================================================================
+train_baseline.py + cifar10 + resnet110
+parameters:
+    parser.add_argument('--print_freq', type=int, default=10, help='frequency of showing training results on console')
+    parser.add_argument('--epochs', type=int, default=200, help='number of total epochs to run')
+    parser.add_argument('--batch_size', type=int, default=128, help='The size of batch')
+    parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
+    parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
+    parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight decay')
+    parser.add_argument('--num_class', type=int, default=10, help='number of classes')
+    parser.add_argument('--cuda', type=int, default=1)
+
+    # net and dataset choosen
+    parser.add_argument('--data_name', type=str, default='cifar10', required=False, help='name of dataset')# cifar10/cifar100
+    parser.add_argument('--net_name', type=str, default='resnet110',required=False, help='name of basenet')
+
+the total train time is:-6.0h9.0m39.4129593372345s
+max prec@1:94.03 Prec@5: 99.93
+
+# 2019-10-23=============================================================================================================
+train_st.py + cifar10 + teacher:resnet20, student:resnet20
+Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_root='./datasets', lambda_st=0.1, lr=0.1, momentum=0.9, num_class=10, print_freq=10, s_init='./results/baseline_r20_000.ckp', s_name='resnet20', save_root='./results', t_model='./results/baseline_r20_200.ckp', t_name='resnet20', weight_decay=0.0001)
+
+the total train time is:-2.0h33.0m44.88991332054138s
+the max test prec@1:93.16 , prec@5:99.89
+
+# 2019-10-23====================================================================================================
+train_st.py +cifar10 + teacher:resnet110, student:resnet20
+Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_root='./datasets', lambda_st=0.1, lr=0.1, momentum=0.9, num_class=10, print_freq=10, s_init='./results/baseline_r20_000.ckp', s_name='resnet20', save_root='./results', t_model='./results/baseline_r110_200.ckp', t_name='resnet110', weight_decay=0.0001)
+
+the total train time is:-3.0h0.0m44.01936221122742s
+the max test prec@1:92.48 , prec@5:99.88
+
+# 2019-10-23====================================================================================================
+train_st.py +cifar10 + teacher:resnet110, student:resnet110
+Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_root='./datasets', lambda_st=0.1, lr=0.1, momentum=0.9, num_class=10, print_freq=10, s_init='./results/baseline_r110_000.ckp', s_name='resnet110', save_root='./results', t_model='./results/baseline_r110_200.ckp', t_name='resnet110', weight_decay=0.0001)
+
+the total train time is:-8.0h11.0m48.51735758781433s
+the max test prec@1:94.04 , prec@5:99.86
+
+# 2019-10-24=====================================================================================================
+train_logits.py +cifar10 + teacher:resnet110, student:resnet110
+Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_root='./datasets', lambda_st=0.1, lr=0.1, momentum=0.9, num_class=10, print_freq=10, s_init='./results/baseline_r110_000.ckp', s_name='resnet110', save_root='./results', t_model='./results/baseline_r110_200.ckp', t_name='resnet110', weight_decay=0.0001)
+
+the total train time is:-8.0h15.0m26.5099196434021s
+the max test prec@1:94.63 , prec@5:99.92
+
+# 2019-10-25====================================================================================================
+train_logits.py +cifar10 + teacher:resnet110, student:resnet20
+Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_root='./datasets', lambda_st=0.1, lr=0.1, momentum=0.9, num_class=10, print_freq=10, s_init='./results/baseline_r20_000.ckp', s_name='resnet20', save_root='./results', t_model='./results/baseline_r110_200.ckp', t_name='resnet110', weight_decay=0.0001)
+
+the total train time is:-3.0h0.0m31.27362036705017s
+the max test prec@1:93.23 , prec@5:99.83
+
+# 2019-10-27==============================================================================================
+添加AlexNet网络结构作为student
