@@ -47,8 +47,8 @@ def main():
 	args = parser.parse_args()
 	print(args)
 
-	if not os.path.exists(os.path.join(args.save_root,'checkpoint')):
-		os.makedirs(os.path.join(args.save_root,'checkpoint'))
+	if not os.path.exists(os.path.join(args.save_root, 'checkpoint')):
+		os.makedirs(os.path.join(args.save_root, 'checkpoint'))
 
 	if args.cuda:
 		cudnn.benchmark = True
@@ -60,8 +60,12 @@ def main():
 
 	tnet = define_tsnet(name=args.t_name, num_class=args.num_class, cuda=args.cuda)
 	checkpoint = torch.load(args.t_model)
-	load_pretrained_model(tnet, checkpoint['net'])
+	if args.t_name =='resnet1202':  # resnet1202是从github上下载的预训练模型，模型存储细节不太一样。。参数巨大：19.4M
+		load_pretrained_model(tnet, checkpoint['state_dict'])
+	else:
+		load_pretrained_model(tnet, checkpoint['net'])
 	tnet.eval()
+
 	for param in tnet.parameters():
 		param.requires_grad = False
 	print('-----------------------------------------------')

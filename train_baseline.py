@@ -19,11 +19,12 @@ parser = argparse.ArgumentParser(description='baseline')
 # various path
 parser.add_argument('--save_root', type=str, default='./results', help='models and logs are saved here')
 parser.add_argument('--img_root', type=str, default='./datasets', help='path name of image dataset')
+parser.add_argument('--save_log', type=str, default='./logs', help='logs are saved here')
 
 # training hyper parameters
 parser.add_argument('--print_freq', type=int, default=10, help='frequency of showing training results on console')
 parser.add_argument('--epochs', type=int, default=200, help='number of total epochs to run')
-parser.add_argument('--batch_size', type=int, default=128, help='The size of batch')
+parser.add_argument('--batch_size', type=int, default=64, help='The size of batch')
 parser.add_argument('--lr', type=float, default=0.1, help='initial learning rate')
 parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
 parser.add_argument('--weight_decay', type=float, default=1e-4, help='weight decay')
@@ -32,7 +33,7 @@ parser.add_argument('--cuda', type=int, default=1)
 
 # net and dataset choosen
 parser.add_argument('--data_name', type=str, default='cifar10', required=False, help='name of dataset')# cifar10/cifar100
-parser.add_argument('--net_name', type=str, default='resnet110',required=False, help='name of basenet')
+parser.add_argument('--net_name', type=str, default='densenetBC100',required=False, help='name of basenet')
 
 def main():
 	global args
@@ -51,7 +52,14 @@ def main():
 
 	# save initial parameters
 	print('saving initial parameters......')
-	save_name = 'baseline_r{}_{:>03}.ckp'.format(args.net_name[6:], 0)
+
+	if args.net_name[:6] == 'resnet':
+		save_name = 'baseline_r{}_{:>03}.ckp'.format(args.net_name[6:], 0)
+	elif args.net_name[:6] == 'resnex':
+		save_name = 'baseline_rx{}_{:>03}.ckp'.format(args.net_name[7:], 0)
+	elif args.net_name[:6] == 'densen':
+		save_name = 'baseline_dBC{}_{:>03}.ckp'.format(args.net_name[10:], 0)
+
 	save_name = os.path.join(args.save_root, 'checkpoint', save_name)
 	save_checkpoint({
 		'epoch': 0,
@@ -110,6 +118,9 @@ def main():
 					download  = True),
 			batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
+	trainF = open(os.path.join(args.save_log, 'train.csv'), 'w')
+	testF = open(os.path.join(args.save_log, 'test.csv'), 'w')
+
 	train_start_time = time.time()
 
 	max_test_prec_1, max_test_prec_5 = 0, 0
@@ -120,14 +131,14 @@ def main():
 		adjust_lr(optimizer, epoch)
 
 		# train one epoch
-		train(train_loader, net, optimizer, criterion, epoch)
+		train(train_loader, net, optimizer, criterion, epoch, trainF)
 		epoch_time = time.time() - epoch_start_time
 		print('one epoch time is {:02}h{:02}m{:02}s'.format(*transform_time(epoch_time)))
 
 		# evaluate on testing set
 		print('testing the models......')
 		test_start_time = time.time()
-		test_prec_1, test_prec_5 = test(test_loader, net, criterion)
+		test_prec_1, test_prec_5 = test(test_loader, net, criterion, testF)
 		test_time = time.time() - test_start_time
 		print('testing time is {:02}h{:02}m{:02}s'.format(*transform_time(test_time)))
 
@@ -145,10 +156,15 @@ def main():
 
 	train_finish_time = time.time()
 	train_total_time = train_start_time - train_finish_time
+
+	trainF.close()
+	testF.close()
+
 	print('the total train time is:{:02}h{:02}m{:02}s'.format(*transform_time(train_total_time)))
 	print('the max test prec@1:{:.2f} , prec@5:{:.2f}'.format(max_test_prec_1, max_test_prec_5))
 
-def train(train_loader, net, optimizer, criterion, epoch):
+
+def train(train_loader, net, optimizer, criterion, epoch, trainF):
 	batch_time = AverageMeter()
 	data_time  = AverageMeter()
 	losses     = AverageMeter()
@@ -190,7 +206,11 @@ def train(train_loader, net, optimizer, criterion, epoch):
 				  epoch, idx, len(train_loader), batch_time=batch_time, data_time=data_time,
 				  losses=losses, top1=top1, top5=top5))
 
-def test(test_loader, net, criterion):
+		trainF.write('{},{},{}\n'.format(epoch, loss.data[0], prec1))
+		trainF.flush()
+
+
+def test(test_loader, net, criterion, testF):
 	losses = AverageMeter()
 	top1   = AverageMeter()
 	top5   = AverageMeter()
@@ -214,7 +234,12 @@ def test(test_loader, net, criterion):
 
 	f_l = [losses.avg, top1.avg, top5.avg]
 	print('Loss: {:.4f}, Prec@1: {:.2f}, Prec@5: {:.2f}'.format(*f_l))
+
+	testF.write('{},{},{}\n'.format(epoch, losses.avg, top1.avg))
+	testF.flush()
+
 	return top1.avg, top5.avg
+
 
 def adjust_lr(optimizer, epoch):
 	scale   = 0.1
@@ -226,6 +251,7 @@ def adjust_lr(optimizer, epoch):
 	print('epoch: {}  lr: {}'.format(epoch, lr))
 	for param_group in optimizer.param_groups:
 		param_group['lr'] = lr
+
 
 if __name__ == '__main__':
 	main()

@@ -71,5 +71,12 @@ Namespace(T=3.0, batch_size=128, cuda=1, data_name='cifar10', epochs=200, img_ro
 the total train time is:-3.0h0.0m31.27362036705017s
 the max test prec@1:93.23 , prec@5:99.83
 
-# 2019-10-27==============================================================================================
-添加AlexNet网络结构作为student
+# 2019-10-28======================================================================================================
+1. 在network.py文件中丰富了resnet的结构，现在包含resnet20  resnet32  resnet110  resnet1202
+2. 从 https://github.com/akamaster/pytorch_resnet_cifar10/ 上下载了pretrained的resnet1202（准确率93.82%）模型， 并可以在代码中load
+
+# 2019-10-29===================================================================================================
+1. 总结了resnet系列模型的演变和各自优缺点，并加到代码中实现。
+2. 由于显卡设备原因，打算用别人预训练过的大模型作为teacher，并保持固定。然后训练小的student模型。
+3. 图像分类数据集的state-of-the-art，包括论文和代码链接，https:/paperwithcode.com/task/image-classification
+
