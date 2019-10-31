@@ -80,3 +80,9 @@ the max test prec@1:93.23 , prec@5:99.83
 2. 由于显卡设备原因，打算用别人预训练过的大模型作为teacher，并保持固定。然后训练小的student模型。
 3. 图像分类数据集的state-of-the-art，包括论文和代码链接，https:/paperwithcode.com/task/image-classification
 
+# 2019-10-30 =============================================================================
+train_baseline.py + cifar10 + densenetBC100
+batch_size 64
+the total train time is:-15.0h21.0m25.62348747253418s
+the max test prec@1:94.88 , prec@5:99.93
+参数数量确实减少了,100层才0.8M,但是训练时间增加
